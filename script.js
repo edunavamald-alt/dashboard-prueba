@@ -921,10 +921,14 @@ async function cargarExcelAutomatico() {
         minDuracion = (r['Hora de finalización'] - r['Hora de inicio']) / 60000;
       }
 
+      // Conversión en hora local para evitar salto de día por zona horaria UTC
       let fechaStr = "";
       const fg = r['Fecha gestion'] || r['Hora de inicio'];
       if (fg instanceof Date && !isNaN(fg)) {
-        fechaStr = fg.toISOString().split('T')[0];
+        const anio = fg.getFullYear();
+        const mes = String(fg.getMonth() + 1).padStart(2, '0');
+        const dia = String(fg.getDate()).padStart(2, '0');
+        fechaStr = `${anio}-${mes}-${dia}`;
       } else {
         fechaStr = String(fg).split(' ')[0];
       }
