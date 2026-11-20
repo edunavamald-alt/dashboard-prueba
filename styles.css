@@ -1,0 +1,309 @@
+/* ==========================================================================
+   VARIABLES Y MODO OSCURO (PALETA CLARO / HITSS)
+   ========================================================================== */
+
+:root {
+  /* Modo Claro por Defecto */
+  --bg-primary: #f4f6f9;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --text-main: #212529;
+  --text-muted: #6c757d;
+  --border-color: #dee2e6;
+  
+  --primary: #e30613;        /* Rojo Claro Corporativo */
+  --primary-hover: #b8050f;
+  --danger: #dc3545;
+  --danger-hover: #bb2d3b;
+  --success: #198754;
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --preview-bg: #e9ecef;
+  --notepad-bg: #fffbe6;
+  --notepad-border: #ffe58f;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  /* Modo Oscuro Premium / Neón */
+  --bg-primary: #0f111a;
+  --bg-card: #1a1d2e;
+  --bg-header: #141724;
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --border-color: #2e344e;
+  
+  --primary: #ff2a3b;        /* Rojo Neón para destacar */
+  --primary-hover: #d91b2c;
+  --danger: #e63946;
+  --danger-hover: #c1121f;
+  --success: #2ec4b6;
+  --input-bg: #10121d;
+  --input-border: #2e344e;
+  --preview-bg: #141724;
+  --notepad-bg: #121526;
+  --notepad-border: #2e344e;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   ESTILOS GENERALES Y LAYOUT
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Header */
+header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease;
+}
+
+.user-info { 
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem; 
+  font-weight: bold; 
+}
+
+/* Contenedor Principal */
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 320px;
+  gap: 16px;
+  padding: 20px;
+  height: calc(100vh - 60px);
+}
+
+@media (max-width: 1100px) {
+  .container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 6px;
+  color: var(--primary);
+}
+
+.lbl-sm {
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 3px;
+  color: var(--text-muted);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.dynamic-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--preview-bg);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px dashed var(--border-color);
+}
+
+/* Entradas de Texto */
+textarea {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  border-radius: 6px;
+  resize: none;
+  font-size: 0.85rem;
+  font-family: monospace;
+}
+
+#outputPlantilla { min-height: 170px; }
+
+input[type="text"], input[type="date"], select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Botones */
+.btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn:hover { background: var(--primary-hover); }
+.btn-secondary { background: var(--text-muted); }
+.btn-success { background: var(--success); }
+.btn-danger { background: var(--danger); }
+.btn-danger:hover { background: var(--danger-hover); }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+.btn-logout {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-theme {
+  background: var(--preview-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Vista Previa */
+.data-preview {
+  background: var(--preview-bg);
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+/* Bloc Notepad */
+.notepad {
+  background: var(--notepad-bg);
+  border: 1px solid var(--notepad-border);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  height: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  color: var(--text-main);
+}
+
+/* Notificación Flotante (Toast) */
+.toast {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: var(--success);
+  color: #ffffff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 12px 20px;
+  position: fixed;
+  z-index: 99999;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease, bottom 0.3s ease;
+}
+
+.toast.show {
+  visibility: visible;
+  opacity: 1;
+  bottom: 40px;
+}
+
+/* Modales */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.login-card, .modal-card {
+  background: var(--bg-card);
+  color: var(--text-main);
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-warning {
+  border-top: 6px solid #ffc107;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-actions button {
+  flex: 1;
+}

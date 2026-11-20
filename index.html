@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Plantillas - Mesa Multiskill</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Modal Login / Sesión -->
+  <div class="modal-overlay" id="loginModal" style="display: flex !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 99999; justify-content: center; align-items: center;">
+    <div class="login-card" style="background: #fff; padding: 25px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center; color: #333;">
+      <h2 style="margin-top:0;">Ingresa tus datos</h2>
+      <p>Configuración de Asesor ADP y Usuario E</p>
+        
+      <div class="login-field" style="margin-bottom: 15px; text-align: left;">
+        <label for="inputNombreADP" style="display:block; font-weight:bold; margin-bottom:5px;">Nombre del ADP</label>
+        <input type="text" id="inputNombreADP" placeholder="Ej: PABLITO CLAVO UN CLAVITO" style="width:100%; padding:10px; box-sizing:border-box;">
+      </div>
+
+      <div class="login-field" style="margin-bottom: 15px; text-align: left;">
+        <label for="inputUsuarioE" style="display:block; font-weight:bold; margin-bottom:5px;">Usuario E (Ej: E760644)</label>
+        <input type="text" id="inputUsuarioE" placeholder="E123456" maxlength="7" style="width:100%; padding:10px; box-sizing:border-box;">
+      </div>
+      <button type="button" class="btn" id="btnIngresarLogin" style="width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Ingresar</button>
+    </div>
+  </div>
+
+  <!-- Modal Advertencia de Duplicado -->
+  <div class="modal-overlay" id="duplicateModal" style="display: none;">
+    <div class="modal-card modal-warning">
+      <h3>⚠️ Plantilla Duplicada Detectada</h3>
+      <p id="duplicateMessage">Esta gestión ya fue agregada anteriormente al Bloc de Notas.</p>
+      <p><strong>¿SEGURO DE QUE DESEA AGREGAR LA PLANTILLA AL BLOC DE NOTAS?</strong></p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-danger" id="btnConfirmarDuplicado">SÍ</button>
+        <button type="button" class="btn btn-secondary" id="btnCancelarDuplicado">NO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header con Contador y Botón de Modo Oscuro -->
+  <header>
+    <h2>Mesa Multiskill HITSS - Generador de Plantillas</h2>
+    <div class="user-info">
+      <button type="button" class="btn-theme" id="btnToggleVista">📊 Ver Dashboard</button>
+      <!-- Contador de Gestiones en Vivo -->
+      <span id="contadorGestiones" style="background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 15px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">
+        Total: 0
+      </span>
+      <button type="button" class="btn-theme" id="btnToggleTheme">
+        <span id="themeIcon"></span> <span id="themeText">Modo Oscuro</span>
+      </button>
+      <span id="labelUsuario">ADP: No conectado</span>
+      <button type="button" class="btn-logout" id="btnCerrarSesion">Salir / Cambiar</button>
+    </div>
+  </header>
+
+  <!-- Layout Principal -->
+  <div class="container">
+    
+    <!-- Columna 1: Pegar Texto de TOA -->
+    <div class="card">
+      <h3>1. Pegar Texto de TOA</h3>
+      <textarea id="rawInput" placeholder="Pega aquí el detalle completo de la actividad copiado de TOA..."></textarea>
+      
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn" id="btnProcesarTOA" style="flex: 1;">Procesar Texto</button>
+        <button type="button" class="btn btn-danger" id="btnLimpiarCol1y2" style="flex: 1;">Limpiar</button>
+      </div>
+      
+      <div class="data-preview">
+        <div>
+          <label class="lbl-sm" for="pvSOT">SOT:</label>
+          <input type="text" id="pvSOT" placeholder="S/N">
+        </div>
+        <div>
+          <label class="lbl-sm" for="pvTel">Teléfono:</label>
+          <input type="text" id="pvTel" placeholder="S/N">
+        </div>
+        <div style="grid-column: span 2;">
+          <label class="lbl-sm" for="pvCliente">Cliente (Seleccionable / Editable):</label>
+          <input type="text" id="pvCliente" placeholder="Nombre del cliente">
+        </div>
+        <div style="grid-column: span 2;">
+          <label class="lbl-sm" for="pvContrata">Contrata:</label>
+          <input type="text" id="pvContrata" placeholder="SAVAL">
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna 2: Generar Plantilla -->
+    <div class="card">
+      <h3>2. Generar Plantilla</h3>
+      
+      <div class="grid-2">
+        <div>
+          <label class="lbl-sm" for="selectCategoria">Categoría Principal</label>
+          <select id="selectCategoria">
+            <option value="CONFIRMA">CONFIRMAR VISITA</option>
+            <option value="CICLO">CICLO DE LLAMADAS</option>
+            <option value="REPROGRAMAR">REPROGRAMACIÓN</option>
+            <option value="RECHAZOS">RECHAZOS</option>
+            <option value="FUERA_TOA">FUERA DE TOA</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl-sm" for="selectSubcategoria">Plantilla Específica</label>
+          <select id="selectSubcategoria">
+            <!-- Se llena dinámicamente -->
+          </select>
+        </div>
+      </div>
+
+      <div id="contenedorDinamico" class="dynamic-inputs">
+        <!-- Campos generados dinámicamente desde JS -->
+      </div>
+
+      <button type="button" class="btn btn-sm" id="btnGenerarPlantilla">Generar Plantilla</button>
+
+      <textarea id="outputPlantilla" readonly placeholder="La plantilla generada aparecerá aquí..."></textarea>
+      
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn btn-secondary" style="flex:1;" id="btnCopiarPlantilla">Copiar Plantilla</button>
+        <button type="button" class="btn btn-success" style="flex:1;" id="btnGuardarBloc">Guardar en Bloc</button>
+      </div>
+    </div>
+
+    <!-- Columna 3: Bloc de Notas / Historial -->
+    <div class="card">
+      <h3>3. Registro Diario (Bloc)</h3>
+      <div class="notepad" id="blocNotasView">Aún no hay registros guardados hoy.</div>
+      <button type="button" class="btn btn-secondary" id="btnExportarBloc">Exportar Bloc (.txt)</button>
+    </div>
+
+    <!-- Columna 4 / Módulo Secundario: Formato Habilitar Franja -->
+    <div class="card" id="cardHabilitarFranja">
+      <h3>4. Formato para Habilitar Franja</h3>
+      <div>
+        <label class="lbl-sm" for="inputSupCargo">Supervisor a Cargo (Editable)</label>
+        <input type="text" id="inputSupCargo" placeholder="Ej: SUPERVISOR JUAN PEREZ">
+      </div>
+
+      <textarea id="outputHabilitarFranja" readonly placeholder="El formato para habilitar franja aparecerá aquí..."></textarea>
+      
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn btn-sm" id="btnGenerarHabilitar" style="flex: 1;">Generar</button>
+        <button type="button" class="btn btn-secondary" id="btnCopiarHabilitar" style="flex: 1;">Copiar Formato</button>
+      </div>
+    </div>
+
+  </div> <!-- Cierre correcto de div.container -->
+
+  <!-- Vista Dashboard / Panel del Administrador -->
+  <div id="dashboardContainer" class="dashboard-wrapper" style="display: none; padding: 20px;">
+    <!-- Barra superior: Botón Actualizar y Filtros -->
+    <div class="card" style="margin-bottom: 16px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: end; justify-content: space-between;">
+        <div>
+          <h3 style="border:none; margin:0;">Panel de Control - Mesa Multiskill (Avance ADP)</h3>
+          <small style="color: var(--text-muted);">Sincronizado automáticamente con <b>Formulario de Registro.xlsx</b> (Sheet1 y Leyenda)</small>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="btn" id="btnRefrescarDB" style="margin:0;">
+            🔄 Actualizar Datos
+          </button>
+<select id="filtroSemana" style="width: auto;"><option value="TODAS">Todas las Semanas</option></select>
+        <select id="filtroDia" style="width: auto;"><option value="TODOS">Todos los Días</option></select>
+        <select id="filtroSubarea" style="width: auto;"><option value="TODAS">Todas las Subáreas</option></select>          <select id="filtroSubarea" style="width: auto;"><option value="TODAS">Todas las Subáreas</option></select>
+          <select id="filtroFranja" style="width: auto;"><option value="TODAS">Todas las Franjas</option></select>
+          <select id="filtroAsesor" style="width: auto;"><option value="TODOS">Todos los Asesores</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fila 1: 5 Tarjetas KPI -->
+    <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px;">
+      <div class="card">
+        <span class="lbl-sm">TOTAL GESTIONES / SOTS ÚNICAS</span>
+        <h2 id="kpiTotal" style="color: var(--primary);">0</h2>
+        <small id="kpiUnicas" style="color: var(--text-muted);">0 SOTs únicas</small>
+      </div>
+      <div class="card">
+        <span class="lbl-sm">% CONTACTABILIDAD</span>
+        <h2 id="kpiContactabilidad" style="color: var(--success);">0%</h2>
+        <small id="kpiContactadosDet" style="color: var(--text-muted);">0 contactados</small>
+      </div>
+      <div class="card">
+        <span class="lbl-sm">EFECTIVIDAD CONFIRMACIÓN</span>
+        <h2 id="kpiConfirmados">0%</h2>
+        <small id="kpiConfirmadosCant" style="color: var(--text-muted);">0 confirmados</small>
+      </div>
+      <div class="card">
+        <span class="lbl-sm">TIEMPO REGISTRO (MEDIANA / PROM)</span>
+        <h2 id="kpiTiempo">0.0 min</h2>
+        <small id="kpiTiempoMeta" style="color: var(--text-muted);">Meta TMA ≤ 9 min</small>
+      </div>
+      <div class="card">
+        <span class="lbl-sm">CALIDAD CÓDIGO E (TER)</span>
+        <h2 id="kpiErroresE">0%</h2>
+        <small id="kpiErroresCant" style="color: var(--text-muted);">0 registros #N/D</small>
+      </div>
+    </div>
+
+    <!-- Fila 2: Gráficos -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+      <div class="card">
+        <h3>Gestiones por Resultado y Franja</h3>
+        <canvas id="chartFranja" height="140"></canvas>
+      </div>
+      <div class="card">
+        <h3>Productividad por Hora (Intervalo 6h - 20h)</h3>
+        <canvas id="chartHoras" height="140"></canvas>
+      </div>
+    </div>
+
+    <!-- Fila 3: Tabla de Índice de Avance por ADP (Fórmula oficial >= 80/día) -->
+    <div class="card">
+      <h3>Índice de Avance por Asesor ADP (Meta: ≥ 80 gestiones/día)</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--primary); color: var(--primary);">
+              <th style="padding: 8px;">Asesor (NOMBRE2)</th>
+              <th style="padding: 8px;">Usuario E</th>
+              <th style="padding: 8px;">Modalidad</th>
+              <th style="padding: 8px;">Días Trab.</th>
+              <th style="padding: 8px;">Total Gestiones</th>
+              <th style="padding: 8px;">Prom / Día</th>
+              <th style="padding: 8px;">Días ≥ 80</th>
+              <th style="padding: 8px;">% Cumplimiento</th>
+            </tr>
+          </thead>
+          <tbody id="tablaAvanceADP">
+            <tr><td colspan="8" style="padding: 12px; text-align: center;">Cargando datos automáticamente...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificación Flotante (Toast) -->
+  <div id="toastNotification" class="toast">Texto copiado</div>
+
+  <!-- Librerías para leer Excel y dibujar Gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Carga de JavaScript -->
+  <script src="script.js"></script>
+</body>
+
+</html>
